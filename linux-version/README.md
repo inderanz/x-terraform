@@ -65,13 +65,13 @@ x-terraform-agent-linux-v0.0.1/
 
 ```bash
 # 1. Download the Linux package (once, from any machine)
-gsutil cp gs://x-agents/x-terraform-agent-linux-v0.0.1-linux-x86_64.tar.gz .
+gsutil cp gs://x-agents/x-terraform-agent-linux-v0.0.1-linux-arm64.tar.gz .
 
 # 2. Transfer to air-gapped Linux environment
-scp x-terraform-agent-linux-v0.0.1-linux-x86_64.tar.gz user@linux-server:/tmp/
+scp x-terraform-agent-linux-v0.0.1-linux-arm64.tar.gz user@linux-server:/tmp/
 
 # 3. Extract and run (on air-gapped Linux machine)
-tar -xzf /tmp/x-terraform-agent-linux-v0.0.1-linux-x86_64.tar.gz
+tar -xzf /tmp/x-terraform-agent-linux-v0.0.1-linux-arm64.tar.gz
 cd x-terraform-agent-linux-v0.0.1
 ./install-linux.sh /path/to/terraform/files
 
@@ -105,31 +105,44 @@ cd x-terraform-agent-linux-v0.0.1
 
 ## 📥 **LINUX DOWNLOAD & INSTALLATION**
 
-### **Step 1: Download from Google Cloud Storage**
+### **Choose Your Linux Platform**
 
+#### **🐧 Linux (x86_64/ARM64) - Current Linux Version**
 ```bash
 # Download the complete Linux offline package (3.4GB)
-gsutil cp gs://x-agents/x-terraform-agent-linux-v0.0.1-linux-x86_64.tar.gz .
+gsutil cp gs://x-agents/x-terraform-agent-linux-v0.0.1-linux-arm64.tar.gz .
 
 # Verify the download
-ls -la x-terraform-agent-linux-v0.0.1-linux-x86_64.tar.gz
+ls -la x-terraform-agent-linux-v0.0.1-linux-arm64.tar.gz
 # Expected size: ~3.4GB
 ```
 
-### **Step 2: Extract the Linux Package**
+#### **🖥️ macOS (ARM64/Intel) - macOS Version**
+```bash
+# Download the complete macOS offline package (3.4GB)
+gsutil cp gs://x-agents/x-terraform-agent-v0.0.1-macos-arm64.tar.gz .
+
+# Verify the download
+ls -la x-terraform-agent-v0.0.1-macos-arm64.tar.gz
+# Expected size: ~3.4GB
+```
+
+> **📋 Platform-Specific Documentation:**
+> - **Linux**: [Current Linux README](README.md) - Complete guide for Linux users
+> - **macOS**: [macOS Version README](../README.md) - Complete guide for macOS users
+
+### **Step 1: Extract the Linux Package**
 
 ```bash
-# Extract the tarball
-tar -xzf x-terraform-agent-linux-v0.0.1-linux-x86_64.tar.gz
-
-# Navigate to the extracted directory
+# Extract the Linux tarball
+tar -xzf x-terraform-agent-linux-v0.0.1-linux-arm64.tar.gz
 cd x-terraform-agent-linux-v0.0.1
 
 # Verify the contents
 ls -la
 ```
 
-### **Step 3: Initialize with Your Terraform Project**
+### **Step 2: Initialize with Your Terraform Project**
 
 ```bash
 # Initialize the agent with your Terraform files
@@ -139,7 +152,7 @@ ls -la
 ./install-linux.sh .
 ```
 
-### **Step 4: Start Using AI Assistance on Linux**
+### **Step 3: Start Using AI Assistance on Linux**
 
 ```bash
 # Start interactive mode (Linux-optimized)
@@ -411,13 +424,13 @@ your-project/
 ### **Step 1: Download the Linux Package**
 ```bash
 # Download the complete Linux offline package
-gsutil cp gs://x-agents/x-terraform-agent-linux-v0.0.1-linux-x86_64.tar.gz .
+gsutil cp gs://x-agents/x-terraform-agent-linux-v0.0.1-linux-arm64.tar.gz .
 ```
 
 ### **Step 2: Extract and Initialize**
 ```bash
 # Extract the package
-tar -xzf x-terraform-agent-linux-v0.0.1-linux-x86_64.tar.gz
+tar -xzf x-terraform-agent-linux-v0.0.1-linux-arm64.tar.gz
 cd x-terraform-agent-linux-v0.0.1
 
 # Initialize with your Terraform files
