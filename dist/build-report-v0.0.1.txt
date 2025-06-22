@@ -1,0 +1,24 @@
+X-Terraform Agent Build Report
+==============================
+
+Version: 0.0.1
+Build Date: Sun Jun 22 19:42:13 AEST 2025
+Build Host: MacBookAir.modem
+Operating System: macos
+Architecture: arm64
+
+Build Components:
+- Agent source code
+- Installation scripts
+- Documentation
+- Examples
+- Platform-specific files
+- Checksums
+
+Package Files:
+- x-terraform-agent-v0.0.1-macos-arm64.tar.gz
+- x-terraform-agent-v0.0.1-macos-arm64.tar.gz.sha256
+- install.sh (GCS installation script)
+- release-notes-v0.0.1.md
+
+Build completed successfully at: Sun Jun 22 19:42:13 AEST 2025

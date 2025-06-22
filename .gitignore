@@ -6,7 +6,6 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -96,7 +95,6 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -269,7 +267,6 @@ workspace/
 test-workspace/
 ollama-model/
 build/
-dist/
 *.tar.gz
 *.tar.gz.sha256
 
@@ -291,4 +288,4 @@ Thumbs.db
 
 # Backup files
 *.bak
-*.backup 
+*.backup *.tar.gz
