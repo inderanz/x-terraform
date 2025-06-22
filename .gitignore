@@ -267,8 +267,6 @@ workspace/
 test-workspace/
 ollama-model/
 build/
-*.tar.gz
-*.tar.gz.sha256
 
 # OS specific
 .DS_Store
@@ -288,4 +286,3 @@ Thumbs.db
 
 # Backup files
 *.bak
-*.backup *.tar.gz
