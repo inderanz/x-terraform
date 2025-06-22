@@ -52,7 +52,7 @@ show_usage() {
     echo ""
     echo "Examples:"
     echo "  $0 start"
-    echo "  $0 query 'Create a VPC with public and private subnets'"
+    echo "  $0 query 'Create a GKE cluster with private nodes'"
     echo "  $0 analyze"
     echo "  $0 --docker start"
     echo "  $0 --model codellama:7b-instruct query 'Review my main.tf'"
