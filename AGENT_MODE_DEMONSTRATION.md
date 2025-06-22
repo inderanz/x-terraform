@@ -482,4 +482,130 @@ The agent successfully demonstrates the ability to:
 - **Explain** changes and reasoning
 - **Guide** users toward best practices
 
-This makes the X-Terraform Agent a powerful tool for both learning Terraform and maintaining production infrastructure code. 
+This makes the X-Terraform Agent a powerful tool for both learning Terraform and maintaining production infrastructure code.
+
+## Demonstration: Advanced GCP GKE Cluster
+
+### Step 1: Original Code (With Issues)
+
+```hcl
+provider "google" {
+  project = var.project_id
+  region  = var.region
+}
+
+resource "google_container_cluster" "primary" {
+  name     = "gke-basic"
+  location = var.region
+
+  initial_node_count = 1
+
+  node_config {
+    machine_type = "e2-medium"
+  }
+}
+```
+
+### Step 2: Agent Review Analysis
+
+```
+⚠️ Issues Found:
+- No VPC/subnet specified (uses default network, not recommended for production)
+- No private nodes or master authorized networks
+- No node pool separation or autoscaling
+- No workload identity or shielded nodes
+- No network policies or logging/monitoring configuration
+```
+
+### Step 3: Agent-Provided Improved Code
+
+```hcl
+resource "google_compute_network" "gke_network" {
+  name                    = "gke-vpc"
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_subnetwork" "gke_subnet" {
+  name          = "gke-subnet"
+  ip_cidr_range = "10.10.0.0/16"
+  region        = var.region
+  network       = google_compute_network.gke_network.id
+  secondary_ip_range {
+    range_name    = "pods"
+    ip_cidr_range = "10.20.0.0/16"
+  }
+  secondary_ip_range {
+    range_name    = "services"
+    ip_cidr_range = "10.30.0.0/16"
+  }
+}
+
+resource "google_container_cluster" "primary" {
+  name     = "gke-advanced"
+  location = var.region
+
+  network    = google_compute_network.gke_network.id
+  subnetwork = google_compute_subnetwork.gke_subnet.id
+
+  remove_default_node_pool = true
+  initial_node_count       = 1
+
+  ip_allocation_policy {
+    cluster_secondary_range_name  = "pods"
+    services_secondary_range_name = "services"
+  }
+
+  private_cluster_config {
+    enable_private_nodes    = true
+    enable_private_endpoint = false
+    master_ipv4_cidr_block  = "172.16.0.0/28"
+  }
+
+  master_authorized_networks_config {
+    cidr_blocks {
+      cidr_block   = "203.0.113.0/24"
+      display_name = "corp-office"
+    }
+  }
+
+  logging_service    = "logging.googleapis.com/kubernetes"
+  monitoring_service = "monitoring.googleapis.com/kubernetes"
+  enable_shielded_nodes = true
+  enable_intranode_visibility = true
+}
+
+resource "google_container_node_pool" "primary_nodes" {
+  name       = "primary-nodes"
+  cluster    = google_container_cluster.primary.name
+  location   = var.region
+
+  node_count = 3
+
+  node_config {
+    machine_type    = "e2-standard-4"
+    oauth_scopes    = ["https://www.googleapis.com/auth/cloud-platform"]
+    service_account = google_service_account.gke_nodes.email
+    workload_metadata_config {
+      mode = "GKE_METADATA"
+    }
+    shielded_instance_config {
+      enable_secure_boot          = true
+      enable_integrity_monitoring = true
+    }
+    labels = {
+      env = var.environment
+    }
+    tags = ["gke-node"]
+  }
+
+  autoscaling {
+    min_node_count = 1
+    max_node_count = 5
+  }
+}
+
+resource "google_service_account" "gke_nodes" {
+  account_id   = "gke-nodes"
+  display_name = "GKE Node Service Account"
+}
+``` 

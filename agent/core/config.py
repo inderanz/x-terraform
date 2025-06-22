@@ -5,7 +5,7 @@ Configuration management for the Terraform Agent.
 import os
 from pathlib import Path
 from typing import Optional, Dict, Any
-from pydantic import Field, validator
+from pydantic import Field, field_validator, ConfigDict
 from pydantic_settings import BaseSettings
 import structlog
 
@@ -14,6 +14,13 @@ logger = structlog.get_logger(__name__)
 
 class AgentConfig(BaseSettings):
     """Configuration for the Terraform Agent."""
+    
+    model_config = ConfigDict(
+        env_prefix="",
+        case_sensitive=False,
+        env_file=".env",
+        protected_namespaces=('settings_',)
+    )
     
     # Agent Configuration
     agent_model: str = Field(
@@ -109,7 +116,8 @@ class AgentConfig(BaseSettings):
         description="Terraform documentation directory"
     )
     
-    @validator('git_repo_path')
+    @field_validator('git_repo_path')
+    @classmethod
     def validate_git_repo_path(cls, v):
         """Validate git repository path."""
         if v is not None:
@@ -122,7 +130,8 @@ class AgentConfig(BaseSettings):
                 return None
         return v
     
-    @validator('data_dir', 'logs_dir', 'docs_dir')
+    @field_validator('data_dir', 'logs_dir', 'docs_dir')
+    @classmethod
     def create_directories(cls, v):
         """Create directories if they don't exist."""
         try:
@@ -134,20 +143,14 @@ class AgentConfig(BaseSettings):
             v.mkdir(parents=True, exist_ok=True)
         return v
     
-    class Config:
-        env_prefix = ""
-        case_sensitive = False
-        env_file = ".env"
-        protected_namespaces = ('settings_',)
-    
     def to_dict(self) -> Dict[str, Any]:
         """Convert configuration to dictionary."""
-        return self.dict()
+        return self.model_dump()
     
     def update_from_env(self):
         """Update configuration from environment variables."""
-        for field_name, field in self.__fields__.items():
-            env_var = field.field_info.extra.get('env', field_name.upper())
+        for field_name, field in self.model_fields.items():
+            env_var = field.json_schema_extra.get('env', field_name.upper()) if field.json_schema_extra else field_name.upper()
             if env_var in os.environ:
                 setattr(self, field_name, os.environ[env_var])
     

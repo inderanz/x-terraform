@@ -130,8 +130,14 @@ if [[ ! -f ".env" ]]; then
     exit 1
 fi
 
-# Load environment variables
-export $(cat .env | xargs)
+# Load environment variables from .env if present
+if [ -f .env ]; then
+  set -a
+  grep -v '^#' .env | grep -v '^[[:space:]]*$' > .env.nocomments
+  source .env.nocomments
+  set +a
+  rm .env.nocomments
+fi
 
 # Function to run agent command
 run_agent() {

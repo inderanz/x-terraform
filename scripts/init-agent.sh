@@ -132,39 +132,24 @@ fi
 # Create environment file
 print_status "Creating environment file: $ENV_FILE"
 cat > "$ENV_FILE" << EOF
-# Terraform Agent Configuration
 AGENT_MODEL=$MODEL
-AGENT_TEMP=0.7
-AGENT_MAX_TOKENS=4096
-
-# Terraform Configuration
-TF_WORKSPACE=default
-TF_BACKEND_TYPE=local
-
-# Git Configuration
+TEMPERATURE=0.7
+MAX_TOKENS=4096
+TERRAFORM_WORKSPACE=default
+TERRAFORM_BACKEND_TYPE=local
 GIT_REPO_PATH=$REPO_PATH
 GIT_BRANCH=main
-
-# Logging Configuration
 LOG_LEVEL=INFO
 LOG_FORMAT=json
-
-# API Configuration
 API_HOST=0.0.0.0
 API_PORT=8000
-
-# Ollama Configuration
 OLLAMA_HOST=http://localhost:11434
 OLLAMA_TIMEOUT=300
-
-# Security Configuration
 REQUIRE_APPROVAL=true
 AUDIT_LOG_ENABLED=true
-
-# File Paths
-DATA_DIR=/app/data
-LOGS_DIR=/app/logs
-DOCS_DIR=/app/docs
+DATA_DIR=./data
+LOGS_DIR=./logs
+DOCS_DIR=./docs
 EOF
 
 print_success "Environment file created: $ENV_FILE"
@@ -249,7 +234,17 @@ else
         cat > "$STARTUP_SCRIPT" << 'EOF'
 #!/bin/bash
 source venv/bin/activate
-export $(cat .env | xargs)
+
+# Source .env file, ignoring comments and blank lines
+if [ -f .env ]; then
+    while IFS= read -r line; do
+        # Skip comments and blank lines
+        if [[ ! "$line" =~ ^[[:space:]]*# ]] && [[ -n "$line" ]]; then
+            export "$line"
+        fi
+    done < .env
+fi
+
 python -m agent.main --interactive
 EOF
         

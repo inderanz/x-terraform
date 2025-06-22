@@ -48,6 +48,7 @@ class TerraformParser:
         """Parse a .tf file."""
         try:
             parsed = hcl2.loads(content)
+            logger.debug(f"HCL2 parsed content: {parsed}")
             
             result = {
                 "file_path": file_path,
@@ -63,29 +64,31 @@ class TerraformParser:
                 "errors": []
             }
             
-            for block in parsed:
-                if isinstance(block, dict):
-                    for key, value in block.items():
-                        if key == "terraform":
-                            result["terraform_blocks"].extend(self._extract_terraform_blocks(value))
-                        elif key == "provider":
-                            result["providers"].extend(self._extract_providers(value))
-                        elif key == "resource":
-                            result["resources"].extend(self._extract_resources(value))
-                        elif key == "data":
-                            result["data_sources"].extend(self._extract_data_sources(value))
-                        elif key == "variable":
-                            result["variables"].extend(self._extract_variables(value))
-                        elif key == "output":
-                            result["outputs"].extend(self._extract_outputs(value))
-                        elif key == "local":
-                            result["locals"].extend(self._extract_locals(value))
-                        elif key == "module":
-                            result["modules"].extend(self._extract_modules(value))
+            # HCL2 returns a dictionary with block types as keys
+            for block_type, block_content in parsed.items():
+                logger.debug(f"Block type: {block_type}, content: {block_content}")
+                if block_type == "terraform":
+                    result["terraform_blocks"].extend(self._extract_terraform_blocks(block_content))
+                elif block_type == "provider":
+                    result["providers"].extend(self._extract_providers(block_content))
+                elif block_type == "resource":
+                    result["resources"].extend(self._extract_resources(block_content))
+                elif block_type == "data":
+                    result["data_sources"].extend(self._extract_data_sources(block_content))
+                elif block_type == "variable":
+                    result["variables"].extend(self._extract_variables(block_content))
+                elif block_type == "output":
+                    result["outputs"].extend(self._extract_outputs(block_content))
+                elif block_type == "locals":
+                    result["locals"].extend(self._extract_locals(block_content))
+                elif block_type == "module":
+                    result["modules"].extend(self._extract_modules(block_content))
             
+            logger.debug(f"Final result: {result}")
             return result
             
         except Exception as e:
+            logger.error(f"Failed to parse Terraform file: {e}")
             return {
                 "file_path": file_path,
                 "file_type": "terraform",
@@ -174,13 +177,15 @@ class TerraformParser:
         resource_list = []
         for resource in resources:
             if isinstance(resource, dict):
+                # HCL2 structure: [{"aws_vpc": {"main": {"cidr_block": "10.0.0.0/16"}}}]
                 for resource_type, resource_blocks in resource.items():
-                    for resource_name, config in resource_blocks.items():
-                        resource_list.append({
-                            "type": resource_type,
-                            "name": resource_name,
-                            "config": config
-                        })
+                    if isinstance(resource_blocks, dict):
+                        for resource_name, config in resource_blocks.items():
+                            resource_list.append({
+                                "type": resource_type,
+                                "name": resource_name,
+                                "config": config
+                            })
         return resource_list
     
     def _extract_data_sources(self, data_sources: List[Dict]) -> List[Dict]:
@@ -188,13 +193,15 @@ class TerraformParser:
         data_list = []
         for data_source in data_sources:
             if isinstance(data_source, dict):
+                # HCL2 structure: [{"aws_ami": {"ubuntu": {"most_recent": True}}}]
                 for data_type, data_blocks in data_source.items():
-                    for data_name, config in data_blocks.items():
-                        data_list.append({
-                            "type": data_type,
-                            "name": data_name,
-                            "config": config
-                        })
+                    if isinstance(data_blocks, dict):
+                        for data_name, config in data_blocks.items():
+                            data_list.append({
+                                "type": data_type,
+                                "name": data_name,
+                                "config": config
+                            })
         return data_list
     
     def _extract_variables(self, variables: List[Dict]) -> List[Dict]:
@@ -202,6 +209,7 @@ class TerraformParser:
         variable_list = []
         for variable in variables:
             if isinstance(variable, dict):
+                # HCL2 structure: [{"region": {"description": "AWS region", "type": "string"}}]
                 for var_name, config in variable.items():
                     variable_list.append({
                         "name": var_name,
@@ -214,6 +222,7 @@ class TerraformParser:
         output_list = []
         for output in outputs:
             if isinstance(output, dict):
+                # HCL2 structure: [{"vpc_id": {"value": "aws_vpc.main.id"}}]
                 for output_name, config in output.items():
                     output_list.append({
                         "name": output_name,
@@ -260,6 +269,10 @@ class TerraformAnalyzer:
                 "files": [],
                 "summary": {
                     "total_files": 0,
+                    "total_resources": 0,
+                    "total_providers": 0,
+                    "total_variables": 0,
+                    "total_outputs": 0,
                     "providers": set(),
                     "resources": set(),
                     "data_sources": set(),
@@ -292,10 +305,16 @@ class TerraformAnalyzer:
             # Analyze dependencies
             analysis["dependencies"] = self._analyze_dependencies(analysis["files"])
             
-            # Convert sets to lists for JSON serialization
+            # Convert sets to lists for JSON serialization and update counts
             for key in analysis["summary"]:
                 if isinstance(analysis["summary"][key], set):
                     analysis["summary"][key] = list(analysis["summary"][key])
+            
+            # Update total counts
+            analysis["summary"]["total_resources"] = len(analysis["summary"]["resources"])
+            analysis["summary"]["total_providers"] = len(analysis["summary"]["providers"])
+            analysis["summary"]["total_variables"] = len(analysis["summary"]["variables"])
+            analysis["summary"]["total_outputs"] = len(analysis["summary"]["outputs"])
             
             return analysis
             
@@ -388,7 +407,8 @@ class TerraformAnalyzer:
             
             validation = {
                 "file_path": file_path,
-                "is_valid": True,
+                "valid": True,
+                "is_valid": True,  # Keep both for compatibility
                 "errors": [],
                 "warnings": [],
                 "suggestions": []
@@ -396,6 +416,7 @@ class TerraformAnalyzer:
             
             # Check for common issues
             if "error" in parsed:
+                validation["valid"] = False
                 validation["is_valid"] = False
                 validation["errors"].append(parsed["error"])
             
@@ -412,6 +433,7 @@ class TerraformAnalyzer:
         except Exception as e:
             return {
                 "file_path": file_path,
+                "valid": False,
                 "is_valid": False,
                 "error": str(e),
                 "errors": [str(e)],
