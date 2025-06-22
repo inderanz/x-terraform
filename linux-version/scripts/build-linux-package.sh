@@ -114,6 +114,14 @@ copy_agent_files() {
     cp -r "$AGENT_DIR/examples" "$target_dir/"
     cp -r "$AGENT_DIR/scripts" "$target_dir/"
     
+    # Copy Python virtual environment with pre-installed dependencies (for offline use)
+    if [ -d "$AGENT_DIR/venv" ]; then
+        cp -r "$AGENT_DIR/venv" "$target_dir/"
+        print_success "Python virtual environment included (offline dependencies)"
+    else
+        print_warning "Virtual environment not found - will install dependencies during setup"
+    fi
+    
     # Copy Ollama model files (for offline installation)
     if [ -d "$AGENT_DIR/ollama-model" ]; then
         cp -r "$AGENT_DIR/ollama-model" "$target_dir/"
@@ -136,7 +144,7 @@ copy_agent_files() {
     # Create VERSION file
     echo "$VERSION" > "$target_dir/VERSION"
     
-    print_success "Agent files copied for Linux (with Ollama models for offline use)"
+    print_success "Agent files copied for Linux (with offline Python dependencies)"
 }
 
 # Create Linux-specific files

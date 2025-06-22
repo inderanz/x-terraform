@@ -1,0 +1,31 @@
+FROM ubuntu:22.04
+
+# Install minimal dependencies (no internet access after this)
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    git \
+    ca-certificates \
+    python3 \
+    python3-pip \
+    python3-venv \
+    python3-dev \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create test user and sudoers.d directory
+RUN mkdir -p /etc/sudoers.d && \
+    useradd -m -s /bin/bash testuser && \
+    echo "testuser ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/testuser
+
+# Set working directory
+WORKDIR /home/testuser
+RUN mkdir -p /home/testuser/test-workspace
+RUN chown -R testuser:testuser /home/testuser
+
+# Switch to test user
+USER testuser
+WORKDIR /home/testuser/test-workspace
+
+# Keep container running
+CMD ["tail", "-f", "/dev/null"]

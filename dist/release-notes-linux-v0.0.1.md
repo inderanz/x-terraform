@@ -1,7 +1,7 @@
 # X-Terraform Agent Linux v0.0.1 Release Notes
 
 ## Release Date
-2025-06-22
+2025-06-23
 
 ## Platform
 - **Operating System**: Linux

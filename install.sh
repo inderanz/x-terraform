@@ -175,6 +175,14 @@ install_python() {
 create_virtual_environment() {
     print_header "Creating Virtual Environment"
     
+    # Check if we have a pre-installed virtual environment
+    if [ -d "$AGENT_DIR/venv" ]; then
+        print_info "Found pre-installed virtual environment - using offline dependencies"
+        cp -r "$AGENT_DIR/venv" "$VENV_DIR"
+        print_success "Pre-installed virtual environment copied (offline mode)"
+        return 0
+    fi
+    
     if [ -d "$VENV_DIR" ]; then
         print_warning "Virtual environment already exists at $VENV_DIR"
         read -p "Remove existing virtual environment? (y/N): " -n 1 -r
@@ -198,6 +206,13 @@ create_virtual_environment() {
 # Install Python dependencies
 install_python_dependencies() {
     print_header "Installing Python Dependencies"
+    
+    # Check if we have a pre-installed virtual environment
+    if [ -d "$AGENT_DIR/venv" ]; then
+        print_info "Using pre-installed virtual environment (offline mode)"
+        print_success "Python dependencies already available"
+        return 0
+    fi
     
     if [ ! -f "$AGENT_DIR/requirements.txt" ]; then
         print_error "requirements.txt not found"

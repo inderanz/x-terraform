@@ -98,8 +98,9 @@ cd x-terraform-agent-v0.0.1
 
 ## 📥 **DOWNLOAD & INSTALLATION**
 
-### **Step 1: Download from Google Cloud Storage**
+### **Choose Your Platform**
 
+#### **🖥️ macOS (ARM64/Intel) - Current Version**
 ```bash
 # Download the complete offline package (3.4GB)
 gsutil cp gs://x-agents/x-terraform-agent-v0.0.1-macos-arm64.tar.gz .
@@ -109,20 +110,36 @@ ls -la x-terraform-agent-v0.0.1-macos-arm64.tar.gz
 # Expected size: ~3.4GB
 ```
 
-### **Step 2: Extract the Package**
+#### **🐧 Linux (x86_64/ARM64) - Linux Version**
+```bash
+# Download the complete offline package (3.4GB)
+gsutil cp gs://x-agents/x-terraform-agent-linux-v0.0.1-linux-arm64.tar.gz .
+
+# Verify the download
+ls -la x-terraform-agent-linux-v0.0.1-linux-arm64.tar.gz
+# Expected size: ~3.4GB
+```
+
+> **📋 Platform-Specific Documentation:**
+> - **macOS**: [Current README](README.md) - Complete guide for macOS users
+> - **Linux**: [Linux Version README](linux-version/README.md) - Optimized for Linux environments
+
+### **Step 1: Extract the Package**
 
 ```bash
-# Extract the tarball
+# For macOS
 tar -xzf x-terraform-agent-v0.0.1-macos-arm64.tar.gz
-
-# Navigate to the extracted directory
 cd x-terraform-agent-v0.0.1
+
+# For Linux
+tar -xzf x-terraform-agent-linux-v0.0.1-linux-arm64.tar.gz
+cd x-terraform-agent-linux-v0.0.1
 
 # Verify the contents
 ls -la
 ```
 
-### **Step 3: Initialize with Your Terraform Project**
+### **Step 2: Initialize with Your Terraform Project**
 
 ```bash
 # Initialize the agent with your Terraform files
@@ -132,7 +149,7 @@ ls -la
 ./scripts/init-agent.sh .
 ```
 
-### **Step 4: Start Using AI Assistance**
+### **Step 3: Start Using AI Assistance**
 
 ```bash
 # Start interactive mode

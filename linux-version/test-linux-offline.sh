@@ -206,7 +206,7 @@ test_offline_functionality() {
     
     # Test 2: Verify Python dependencies are available
     print_info "Testing 2: Verifying Python dependencies..."
-    if docker exec "$CONTAINER_NAME" bash -c "cd $test_dir && python3 -c 'import fastapi, pydantic, openai; print(\"Dependencies available\")'"; then
+    if docker exec "$CONTAINER_NAME" bash -c "cd $test_dir && source venv/bin/activate && python3 -c 'import fastapi, pydantic, openai; print(\"Dependencies available\")'"; then
         print_success "Python dependencies available"
     else
         print_error "Python dependencies missing"
@@ -215,7 +215,7 @@ test_offline_functionality() {
     
     # Test 3: Test agent initialization without internet
     print_info "Testing 3: Testing agent initialization (offline)..."
-    if docker exec "$CONTAINER_NAME" bash -c "cd $test_dir && python3 -m agent.main --status"; then
+    if docker exec "$CONTAINER_NAME" bash -c "cd $test_dir && source venv/bin/activate && python3 -m agent.main --status"; then
         print_success "Agent initialization works offline"
     else
         print_warning "Agent initialization failed (may be expected without Ollama running)"
@@ -223,7 +223,7 @@ test_offline_functionality() {
     
     # Test 4: Test Terraform parser (core functionality)
     print_info "Testing 4: Testing Terraform parser (core functionality)..."
-    if docker exec "$CONTAINER_NAME" bash -c "cd $test_dir && python3 -c 'from agent.terraform.parser import TerraformParser; parser = TerraformParser(); print(\"Parser works offline\")'"; then
+    if docker exec "$CONTAINER_NAME" bash -c "cd $test_dir && source venv/bin/activate && python3 -c 'from agent.terraform.parser import TerraformParser; parser = TerraformParser(); print(\"Parser works offline\")'"; then
         print_success "Terraform parser works offline"
     else
         print_error "Terraform parser failed"
