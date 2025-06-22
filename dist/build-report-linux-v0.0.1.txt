@@ -1,0 +1,31 @@
+X-Terraform Agent Linux Build Report
+====================================
+
+Version: 0.0.1
+Build Date: Sun Jun 22 22:33:38 AEST 2025
+Build Host: MacBookAir.modem
+Operating System: Linux
+Architecture: arm64
+
+Build Components:
+- Agent source code
+- Linux-specific installation scripts
+- Documentation
+- Examples
+- Platform-specific files
+- Checksums
+
+Package Files:
+- x-terraform-agent-linux-v0.0.1-linux-arm64.tar.gz
+- x-terraform-agent-linux-v0.0.1-linux-arm64.tar.gz.sha256
+- release-notes-linux-v0.0.1.md
+
+Linux-Specific Features:
+- install-linux.sh: Linux-specific installation script
+- start-agent-linux.sh: Linux-specific start script
+- health-check-linux.sh: Linux-specific health check
+- Automatic system dependency installation
+- Ollama service management
+- Distribution detection and configuration
+
+Build completed successfully at: Sun Jun 22 22:33:38 AEST 2025

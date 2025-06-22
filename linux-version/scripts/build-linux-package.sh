@@ -26,8 +26,11 @@ FULL_PACKAGE_NAME="${PACKAGE_NAME}-v${VERSION}"
 # Logging
 LOG_FILE="$AGENT_DIR/logs/build-linux-$(date +%Y%m%d-%H%M%S).log"
 
-# Create logs directory if it doesn't exist
-mkdir -p "$AGENT_DIR/logs"
+# Create logs directory if it doesn't exist (use relative path and handle errors)
+mkdir -p "$AGENT_DIR/logs" 2>/dev/null || {
+    # Fallback to current directory if we can't create in agent directory
+    LOG_FILE="./build-linux-$(date +%Y%m%d-%H%M%S).log"
+}
 
 log() {
     echo -e "$1" | tee -a "$LOG_FILE"
@@ -133,7 +136,7 @@ copy_agent_files() {
     # Create VERSION file
     echo "$VERSION" > "$target_dir/VERSION"
     
-    print_success "Agent files copied for Linux"
+    print_success "Agent files copied for Linux (with Ollama models for offline use)"
 }
 
 # Create Linux-specific files

@@ -1,0 +1,45 @@
+FROM ubuntu:22.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Update and install basic dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    git \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    software-properties-common \
+    sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python 3.9
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    python3-dev \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create test user with sudo access
+RUN useradd -m -s /bin/bash testuser && \
+    echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+USER testuser
+WORKDIR /home/testuser
+
+# Create test directory
+RUN mkdir -p /home/testuser/test-workspace
+
+# Copy test files
+COPY --chown=testuser:testuser test-workspace/ /home/testuser/test-workspace/
+
+# Set working directory
+WORKDIR /home/testuser/test-workspace
+
+# Default command
+CMD ["/bin/bash"]

@@ -6,6 +6,15 @@
 
 ---
 
+## 📋 **Platform Support**
+
+- **🐧 Linux (x86_64/ARM64)**: [Current Version](README.md) - Optimized for Linux environments with independent lifecycle
+- **🖥️ macOS (ARM64/Intel)**: [macOS Version](../README.md) - Complete offline package with Ollama integration
+
+> **Note**: Each platform has its own optimized package and documentation. Choose the version that matches your operating system.
+
+---
+
 ## 🔥 **WHY X-TERRAFORM AGENT LINUX? The Offline Revolution**
 
 ### 🆚 **X-Terraform Agent Linux vs. Any Free LLM**
