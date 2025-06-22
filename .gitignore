@@ -286,3 +286,5 @@ Thumbs.db
 
 # Backup files
 *.bak
+*.tar.gz
+*.tar.gz.sha256
