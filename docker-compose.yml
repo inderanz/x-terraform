@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  terraform-agent:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: terraform-agent
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./agent:/app/agent
+      - ./config:/app/config
+      - ./docs:/app/docs
+      - ./scripts:/app/scripts
+      - ./tests:/app/tests
+      - ${GIT_REPO_PATH:-./workspace}:/workspace:ro
+      - agent-data:/app/data
+    environment:
+      - AGENT_MODEL=${AGENT_MODEL:-codellama:7b-instruct}
+      - AGENT_TEMP=${AGENT_TEMP:-0.7}
+      - AGENT_MAX_TOKENS=${AGENT_MAX_TOKENS:-4096}
+      - TF_WORKSPACE=${TF_WORKSPACE:-default}
+      - TF_BACKEND_TYPE=${TF_BACKEND_TYPE:-local}
+      - GIT_REPO_PATH=${GIT_REPO_PATH:-/workspace}
+      - GIT_BRANCH=${GIT_BRANCH:-main}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    depends_on:
+      - ollama
+    restart: unless-stopped
+    networks:
+      - terraform-agent-network
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    restart: unless-stopped
+    networks:
+      - terraform-agent-network
+
+  # Optional: Redis for caching (if needed for production)
+  redis:
+    image: redis:7-alpine
+    container_name: terraform-agent-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - terraform-agent-network
+    profiles:
+      - production
+
+volumes:
+  agent-data:
+    driver: local
+  ollama-data:
+    driver: local
+  redis-data:
+    driver: local
+
+networks:
+  terraform-agent-network:
+    driver: bridge 
